@@ -6,6 +6,7 @@ import { GameEventsService } from './services/gep.service';
 import { MainWindowController } from './controllers/main-window.controller';
 import { DemoOSRWindowController } from './controllers/demo-osr-window.controller';
 import { OverlayInputService } from './services/overlay-input.service';
+import { ScreenCaptureService } from './services/screen-capture.service';
 
 /**
  * TODO: Integrate your own dependency-injection library
@@ -15,6 +16,7 @@ const bootstrap = (): Application => {
   const overlayHotkeysService = new OverlayHotkeysService(overlayService);
   const gepService = new GameEventsService();
   const inputService = new OverlayInputService(overlayService);
+  const screenCaptureService = new ScreenCaptureService();
 
   const createDemoOsrWindowControllerFactory = (): DemoOSRWindowController => {
     const controller = new DemoOSRWindowController(overlayService);
@@ -26,10 +28,11 @@ const bootstrap = (): Application => {
     overlayService,
     createDemoOsrWindowControllerFactory,
     overlayHotkeysService,
-    inputService
+    inputService,
+    screenCaptureService
   );
 
-  return new Application(overlayService, gepService, mainWindowController);
+  return new Application(overlayService, gepService, mainWindowController, screenCaptureService);
 }
 
 const app = bootstrap();

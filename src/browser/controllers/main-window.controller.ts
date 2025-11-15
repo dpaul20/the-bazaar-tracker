@@ -6,6 +6,7 @@ import { OverlayService } from '../services/overlay.service';
 import { overwolf } from '@overwolf/ow-electron';
 import { OverlayHotkeysService } from '../services/overlay-hotkeys.service';
 import { ExclusiveHotKeyMode, OverlayInputService } from '../services/overlay-input.service';
+import { ScreenCaptureService } from '../services/screen-capture.service';
 
 const owElectronApp = electronApp as overwolf.OverwolfApp;
 
@@ -23,7 +24,8 @@ export class MainWindowController {
     private readonly overlayService: OverlayService,
     private readonly createDemoOsrWinController: () => DemoOSRWindowController,
     private readonly overlayHotkeysService: OverlayHotkeysService,
-    private readonly overlayInputService: OverlayInputService
+    private readonly overlayInputService: OverlayInputService,
+    private readonly screenCaptureService: ScreenCaptureService
   ) {
     this.registerToIpc();
 
@@ -141,6 +143,44 @@ export class MainWindowController {
         // native
         this.overlayInputService.mode = ExclusiveHotKeyMode.AutoRelease;
       }
+    });
+
+    // Screen capture IPC handlers
+    ipcMain.handle('screen-capture:start', async () => {
+      this.screenCaptureService.startCapture();
+      return { success: true };
+    });
+
+    ipcMain.handle('screen-capture:stop', async () => {
+      this.screenCaptureService.stopCapture();
+      return { success: true };
+    });
+
+    ipcMain.handle('screen-capture:get-last', async () => {
+      const capture = this.screenCaptureService.getLastScreenshot();
+      if (!capture) {
+        return null;
+      }
+      return {
+        dataURL: capture.image.toDataURL(),
+        metadata: capture.metadata,
+      };
+    });
+
+    ipcMain.handle('screen-capture:get-all', async () => {
+      const captures = this.screenCaptureService.getAllScreenshots();
+      return captures.map(c => ({
+        dataURL: c.image.toDataURL(),
+        metadata: c.metadata,
+      }));
+    });
+
+    ipcMain.handle('screen-capture:list-windows', async () => {
+      return await this.screenCaptureService.listAvailableWindows();
+    });
+
+    ipcMain.handle('screen-capture:stats', async () => {
+      return this.screenCaptureService.getStats();
     });
 
   }
