@@ -1,8 +1,12 @@
-﻿# US 1.1 — Migrar proyecto a Overwolf-Electron
+# US 1.1 — Migrar proyecto a Overwolf-Electron
 
 ## Contexto
 
 Migrar el scaffold actual (Electron Forge + Vite + TS) a **@overwolf/ow-electron** sin romper scripts ni tipados. Se habilitará el paquete `overlay` para futuras ventanas in-game y se preparará el entorno para servicios (captura/OCR) en sprints siguientes.
+
+## Descripción
+
+Como desarrollador quiero convertir el proyecto Electron actual en una aplicación ow-electron para tener acceso a las APIs de Overwolf y poder distribuir la app.
 
 ## Tareas Técnicas
 
@@ -21,12 +25,11 @@ Migrar el scaffold actual (Electron Forge + Vite + TS) a **@overwolf/ow-electron
 
 ## Métricas
 
-- Tiempo de inicio (informativo): < 2s
+- Tiempo de inicio: < 2s
 - Errores de TypeScript: 0
-- `npm run build` y `npm run start` exitosos
+- Build y start exitosos
 
 ## Referencias
 
-- ../../EPIC1_REFINEMENT.md
-- [Epic #1](https://github.com/dpaul20/the-bazaar-tracker/issues/1)
-- [US 1.1 – #38](https://github.com/dpaul20/the-bazaar-tracker/issues/38)
+- Epic 01: ../epics/epic-01-setup-overwolf-electron.md
+- Issue: #38
