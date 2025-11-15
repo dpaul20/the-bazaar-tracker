@@ -7,6 +7,15 @@
 **Duración:** Sprint 1 (Nov 17-30, 2025)  
 **Complejidad Total:** 12 Story Points
 
+### 🔗 Vínculos Canónicos
+
+- Epic: [#1](https://github.com/dpaul20/the-bazaar-tracker/issues/1)
+- US 1.1: [#38](https://github.com/dpaul20/the-bazaar-tracker/issues/38)
+- US 1.2: [#35](https://github.com/dpaul20/the-bazaar-tracker/issues/35)
+- US 1.3: [#36](https://github.com/dpaul20/the-bazaar-tracker/issues/36)
+- US 1.4: [#37](https://github.com/dpaul20/the-bazaar-tracker/issues/37)
+- Milestone Sprint 1: [#5](https://github.com/dpaul20/the-bazaar-tracker/milestone/5)
+
 ---
 
 ## 🔍 Investigación Técnica Realizada
@@ -508,4 +517,4 @@ the-bazaar-tracker/
 
 **Documento creado:** 2025-11-15  
 **Última actualización:** 2025-11-15  
-**Sprint:** 1 (Nov 17-30, 2025)
+**Sprint:** 1 (Nov 17-30, 2025) — Milestone: [Sprint 1](https://github.com/dpaul20/the-bazaar-tracker/milestone/5)

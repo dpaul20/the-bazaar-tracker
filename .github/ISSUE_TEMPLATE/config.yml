@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+- name: Preguntas y soporte general
+  url: https://github.com/dpaul20/the-bazaar-tracker/discussions
+  about: Usa Discussions para dudas o feedback no relacionado a bugs/historias.
