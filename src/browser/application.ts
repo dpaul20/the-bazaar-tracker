@@ -4,6 +4,7 @@ import { OverlayService } from './services/overlay.service';
 import { kGameIds } from "@overwolf/ow-electron-packages-types/game-list";
 import { kGepSupportedGameIds } from '@overwolf/ow-electron-packages-types/gep-supported-games';
 import { GameEventsService } from './services/gep.service';
+import { ScreenCaptureService } from './services/screen-capture.service';
 
 export class Application {
   /**
@@ -12,7 +13,8 @@ export class Application {
   constructor(
     private readonly overlayService: OverlayService,
     private readonly gepService: GameEventsService,
-    private readonly mainWindowController: MainWindowController) {
+    private readonly mainWindowController: MainWindowController,
+    private readonly screenCaptureService: ScreenCaptureService) {
 
     overlayService.on('ready', this.onOverlayServiceReady.bind(this));
 
@@ -52,6 +54,10 @@ export class Application {
     
     const showDevTools = true;
     this.mainWindowController.createAndShow(showDevTools);
+    
+    // Start screen capture service (US 1.2)
+    console.log('📸 Starting screen capture service...');
+    this.screenCaptureService.startCapture();
   }
 
   /**

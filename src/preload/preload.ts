@@ -57,4 +57,24 @@ contextBridge.exposeInMainWorld('overlay', {
   }
 });
 
+contextBridge.exposeInMainWorld('screenCapture', {
+  start: () => {
+    return ipcRenderer.invoke('screen-capture:start');
+  },
+  stop: () => {
+    return ipcRenderer.invoke('screen-capture:stop');
+  },
+  getLastScreenshot: () => {
+    return ipcRenderer.invoke('screen-capture:get-last');
+  },
+  getAllScreenshots: () => {
+    return ipcRenderer.invoke('screen-capture:get-all');
+  },
+  listWindows: () => {
+    return ipcRenderer.invoke('screen-capture:list-windows');
+  },
+  getStats: () => {
+    return ipcRenderer.invoke('screen-capture:stats');
+  }
+});
 
