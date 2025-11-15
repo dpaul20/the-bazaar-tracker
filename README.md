@@ -1,8 +1,16 @@
-# ow-electron-packages-sample
+# The Bazaar Tracker
 
-A basic sample app, demonstrating how [@overwolf/ow-electron](https://npmjs.com/package/@overwolf/ow-electron) packages (Overlay, Game Events) work.
+Overwolf Electron app para trackear estadísticas y progreso en el juego **The Bazaar**.
 
-For more details about ow-electron, as well as how to fully utilize it, please refer to the official [documentation](https://overwolf.github.io/tools/ow-electron).
+Construido con [@overwolf/ow-electron](https://npmjs.com/package/@overwolf/ow-electron) para acceso a overlays in-game y Game Events Provider (GEP).
+
+## Features
+
+- 🎮 Overlay in-game para visualización en tiempo real
+- 📊 Captura de eventos del juego via GEP
+- 🔧 Arquitectura basada en el sample oficial de ow-electron
+
+Para más detalles sobre ow-electron, consultar la [documentación oficial](https://overwolf.github.io/tools/ow-electron).
 
 ## Setup
 

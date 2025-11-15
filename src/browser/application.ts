@@ -45,6 +45,11 @@ export class Application {
    *
    */
   private initialize() {
+    // Log App ID as required by US 1.1 DoD
+    console.log('🎮 The Bazaar Tracker - Overwolf Electron App');
+    console.log('📦 App ID:', process.env.npm_package_name || 'com.thebazaar.tracker');
+    console.log('🔧 Overwolf packages enabled:', ['gep', 'overlay']);
+    
     const showDevTools = true;
     this.mainWindowController.createAndShow(showDevTools);
   }
