@@ -1,45 +1,23 @@
 import {app as ElectronApp } from 'electron';
 import { Application } from "./application";
-import { OverlayHotkeysService } from './services/overlay-hotkeys.service';
-import { OverlayService } from './services/overlay.service';
 import { GameEventsService } from './services/gep.service';
 import { MainWindowController } from './controllers/main-window.controller';
-import { DemoOSRWindowController } from './controllers/demo-osr-window.controller';
-import { OverlayInputService } from './services/overlay-input.service';
 import { ScreenCaptureService } from './services/screen-capture.service';
 
-/**
- * TODO: Integrate your own dependency-injection library
- */
+// Bootstrap lightweight wiring; DI framework not needed for now.
 const bootstrap = (): Application => {
-  const overlayService = new OverlayService();
-  const overlayHotkeysService = new OverlayHotkeysService(overlayService);
   const gepService = new GameEventsService();
-  const inputService = new OverlayInputService(overlayService);
   const screenCaptureService = new ScreenCaptureService();
 
-  const createDemoOsrWindowControllerFactory = (): DemoOSRWindowController => {
-    const controller = new DemoOSRWindowController(overlayService);
-    return controller;
-  }
+  const mainWindowController = new MainWindowController(gepService, screenCaptureService);
 
-  const mainWindowController = new MainWindowController(
-    gepService,
-    overlayService,
-    createDemoOsrWindowControllerFactory,
-    overlayHotkeysService,
-    inputService,
-    screenCaptureService
-  );
-
-  return new Application(overlayService, gepService, mainWindowController, screenCaptureService);
+  return new Application(gepService, mainWindowController, screenCaptureService);
 }
 
 const app = bootstrap();
 
-ElectronApp.whenReady().then(() => {
-  app.run();
-});
+// eslint-disable-next-line unicorn/prefer-top-level-await
+ElectronApp.whenReady().then(() => { app.run(); });
 
 ElectronApp.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
