@@ -22,40 +22,10 @@ contextBridge.exposeInMainWorld('gep', {
     ipcRenderer.on('console-message',(e, ...args)=>{
       func(...args);
     });
-  },
-
-  setRequiredFeature: () => {
-    return ipcRenderer.invoke('gep-set-required-feature');
-  },
-
-  getInfo: () => {
-    return ipcRenderer.invoke('gep-getInfo');
-  },
-});
-
-contextBridge.exposeInMainWorld('osr', {
-  openOSR: () => {
-    return ipcRenderer.invoke('createOSR');
-  },
-  toggle: () => {
-    return ipcRenderer.invoke('toggleOSRVisibility');
-  },
-  updateHotkey: () => {
-    return ipcRenderer.invoke('updateHotkey');
-  },
-});
-
-contextBridge.exposeInMainWorld('overlay', {
-  setExclusiveModeType: (mode) => {
-    return ipcRenderer.invoke('EXCLUSIVE_TYPE', mode);
-  },
-  setExclusiveModeHotkeyBehavior: (behavior) => {
-    return ipcRenderer.invoke('EXCLUSIVE_BEHAVIOR',behavior );
-  },
-  updateExclusiveOptions: (options) => {
-    return ipcRenderer.invoke('updateExclusiveOptions', options);
   }
 });
+
+// Removed OSR and overlay demo exposures
 
 contextBridge.exposeInMainWorld('screenCapture', {
   start: () => {

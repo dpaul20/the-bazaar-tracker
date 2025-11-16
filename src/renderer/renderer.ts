@@ -1,143 +1,138 @@
 console.log('renderer script');
 
-//@ts-ignore
-window.gep.onMessage(function(...args) {
+// @ts-ignore
+globalThis.gep.onMessage(function(...args) {
   console.info(...args);
 
   let item = ''
-  args.forEach(arg => {
+  for (const arg of args) {
     item = `${item}-${JSON.stringify(arg)}`;
-  })
+  }
   addMessageToTerminal(item);
 
 });
 
-
-const btn = document.querySelector('#clearTerminalTextAreaBtn') as HTMLButtonElement;
-
-btn.addEventListener('click', function(e) {
-  var begin = new Date().getTime();
-  const terminal = document.querySelector('#TerminalTextArea');
-  terminal.innerHTML = '';
-});
-
-const setRequiredBtn = document.querySelector('#setRequiredFeaturesBtn') as HTMLButtonElement;
-setRequiredBtn.addEventListener('click', async function(e) {
+// Screen Capture UI wiring
+async function scRefreshOnce() {
   try {
     // @ts-ignore
-    await window.gep.setRequiredFeature();
-    addMessageToTerminal('setRequiredFeatures ok');
-  } catch (error) {
-    addMessageToTerminal('setRequiredFeatures error');
-    alert('setRequiredFeatures error' + error);
+    const last = await globalThis.screenCapture.getLastScreenshot();
+    const img = document.getElementById('scPreview') as HTMLImageElement | null;
+    const statsEl = document.getElementById('scStats') as HTMLPreElement | null;
+    if (!img || !statsEl) return;
+
+    if (last?.dataURL) {
+      img.src = last.dataURL;
+      const { metadata } = last;
+      statsEl.textContent = JSON.stringify({
+        timestamp: new Date(metadata.timestamp).toISOString(),
+        windowName: metadata.windowName,
+        size: metadata.size
+      }, null, 2);
+    } else {
+      img.removeAttribute('src');
+      statsEl.textContent = 'No screenshot yet';
+    }
+  } catch (e) {
+    console.error('screenCapture refresh error', e);
+    addMessageToTerminal('screenCapture refresh error');
   }
-});
+}
 
-const getInfoBtn = document.querySelector('#getInfoBtn') as HTMLButtonElement;
-getInfoBtn.addEventListener('click', async function(e) {
-  try {
-    // @ts-ignore
-    const info = await window.gep.getInfo();
-    addMessageToTerminal(JSON.stringify(info));
-  } catch (error) {
-    addMessageToTerminal('getInfo error');
-    alert('getInfo error' + error);
+let scInterval: number | null = null;
+
+function scStartAutoRefresh() {
+  if (scInterval) return;
+  // refresh right away, then every 3s to match capture cadence
+  scRefreshOnce();
+  scInterval = globalThis.setInterval(scRefreshOnce, 3000) as unknown as number;
+}
+
+function scStopAutoRefresh() {
+  if (scInterval) {
+    globalThis.clearInterval(scInterval);
+    scInterval = null;
   }
-});
+}
 
-const createOSRBtn = document.querySelector('#createOSR') as HTMLButtonElement;
-createOSRBtn.addEventListener('click', async function(e) {
-  try {
-    // @ts-ignore
-    const info = await window.osr.openOSR();
-  } catch (error) {
-    addMessageToTerminal('createOSR error');
-  }
-});
+function wireScreenCaptureControls() {
+  const startBtn = document.getElementById('scStartBtn');
+  const stopBtn = document.getElementById('scStopBtn');
+  const refreshBtn = document.getElementById('scRefreshBtn');
+  const listBtn = document.getElementById('scListBtn');
 
-const visibilityOSRBtn = document.querySelector('#visibilityOSR') as HTMLButtonElement;
-visibilityOSRBtn.addEventListener('click', async function(e) {
-  try {
-    // @ts-ignore
-    const info = await window.osr.toggle();
-  } catch (error) {
-    console.log(error);
-    addMessageToTerminal('toggle osr error');
-  }
-});
+  if (startBtn) startBtn.addEventListener('click', async () => {
+    try {
+      // @ts-ignore
+      await globalThis.screenCapture.start();
+      scStartAutoRefresh();
+      addMessageToTerminal('screenCapture started');
+    } catch (e) {
+      console.error('screenCapture start error', e);
+      addMessageToTerminal('screenCapture start error');
+    }
+  });
+
+  if (stopBtn) stopBtn.addEventListener('click', async () => {
+    try {
+      // @ts-ignore
+      await globalThis.screenCapture.stop();
+      scStopAutoRefresh();
+      addMessageToTerminal('screenCapture stopped');
+    } catch (e) {
+      console.error('screenCapture stop error', e);
+      addMessageToTerminal('screenCapture stop error');
+    }
+  });
+
+  if (refreshBtn) refreshBtn.addEventListener('click', scRefreshOnce);
+
+  if (listBtn) listBtn.addEventListener('click', async () => {
+    try {
+      // @ts-ignore
+      const list = await globalThis.screenCapture.listWindows();
+      addMessageToTerminal(`windows: ${JSON.stringify(list.map((w:any)=>({ name:w.name, id:w.id })))}`);
+    } catch (e) {
+      console.error('screenCapture list error', e);
+      addMessageToTerminal('screenCapture list error');
+    }
+  });
+
+  // Try to fetch stats on load
+  (async () => {
+    try {
+      // @ts-ignore
+      const s = await globalThis.screenCapture.getStats();
+      addMessageToTerminal(`screenCapture stats: ${JSON.stringify(s)}`);
+    } catch {}
+  })();
+}
 
 
-const updateHotkeyBtn = document.querySelector('#updateHotkey') as HTMLButtonElement;
-updateHotkeyBtn.addEventListener('click', async function(e) {
-  try {
-    // @ts-ignore
-    const info = await window.osr.updateHotkey();
-  } catch (error) {
-    console.log(error);
-    addMessageToTerminal('toggle osr error');
-  }
-});
+// Clear terminal button
+const btn = document.querySelector<HTMLButtonElement>('#clearTerminalTextAreaBtn');
+if (btn) {
+  btn.addEventListener('click', () => {
+    const terminal = document.querySelector<HTMLTextAreaElement>('#TerminalTextArea');
+    if (terminal) {
+      terminal.value = '';
+    }
+  });
+}
 
 
-function addMessageToTerminal(message) {
-  const terminal = document.querySelector('#TerminalTextArea');
-  // $('#TerminalTextArea');
-  terminal.append(message + '\n');
+function addMessageToTerminal(message: string) {
+  const terminal = document.querySelector<HTMLTextAreaElement>('#TerminalTextArea');
+  if (!terminal) return;
+  terminal.value += message + '\n';
   terminal.scrollTop = terminal.scrollHeight;
 }
 
-export function sendExclusiveOptions() {
-  const color = (document.getElementById('colorPicker') as HTMLInputElement).value;
-
-  const r = parseInt(color.substr(1,2), 16);
-  const g = parseInt(color.substr(3,2), 16);
-  const b = parseInt(color.substr(5,2), 16);
-  const a = (document.getElementById('opacityRange') as HTMLInputElement).value;
-
-  const options = {
-     color: `rgba(${r},${g},${b},${a})`,
-     animationDuration:
-      parseInt((document.getElementById('animationDurationRange') as HTMLInputElement).value)
-  };
-
-  // @ts-ignore
-  window.overlay.updateExclusiveOptions(options);
-}
 
 
+// Removed overlay exclusive UI wiring
 
-const opacityRange = document.getElementById('opacityRange') as HTMLInputElement;
-opacityRange.addEventListener('change', (ev) => {
-  sendExclusiveOptions();
-})
-
-const animationDurationRange = document.getElementById('animationDurationRange') as HTMLInputElement;
-animationDurationRange.addEventListener('change', (ev) => {
-  sendExclusiveOptions();
-})
-
-const colorPicker = document.getElementById('colorPicker') as HTMLInputElement;
-colorPicker.addEventListener('change', (ev) => {
-  sendExclusiveOptions();
-})
-
-
-document.querySelectorAll('[name="behavior"]').forEach(
-  (radio)=>{radio.addEventListener('change',(a)=>{
-    const radio = a.target as HTMLInputElement;
-    if (radio.checked) {
-      // @ts-ignore
-      window.overlay.setExclusiveModeHotkeyBehavior(radio.value);
-    }
-  })
-})
-
-document.querySelectorAll('[name="exclusiveType"]').forEach(
-  (radio)=>{radio.addEventListener('change',(a)=>{
-    const radio = a.target as HTMLInputElement;
-    if (radio.checked) {
-      // @ts-ignore
-      window.overlay.setExclusiveModeType(radio.value);
-    }
-  })
-})
+// wire after DOM ready (current file is loaded via script tag at top, so defer wiring)
+globalThis.addEventListener('DOMContentLoaded', () => {
+  wireScreenCaptureControls();
+});

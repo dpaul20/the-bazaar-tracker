@@ -1,5 +1,5 @@
 import { desktopCapturer, NativeImage } from 'electron';
-import EventEmitter from 'events';
+import EventEmitter from 'node:events';
 
 interface CaptureMetadata {
   timestamp: number;
@@ -13,7 +13,7 @@ interface CaptureBuffer {
 }
 
 export class ScreenCaptureService extends EventEmitter {
-  private captureBuffer: CaptureBuffer[] = [];
+  private readonly captureBuffer: CaptureBuffer[] = [];
   private readonly maxBufferSize = 3;
   private readonly targetWindowName = 'The Bazaar';
   private captureInterval: NodeJS.Timeout | null = null;
@@ -61,7 +61,7 @@ export class ScreenCaptureService extends EventEmitter {
    * Get the most recent screenshot
    */
   public getLastScreenshot(): CaptureBuffer | null {
-    return this.captureBuffer[this.captureBuffer.length - 1] || null;
+    return this.captureBuffer.at(-1) || null;
   }
 
   /**
@@ -81,9 +81,9 @@ export class ScreenCaptureService extends EventEmitter {
     });
 
     console.log(`🪟 Found ${sources.length} available windows:`);
-    sources.forEach(source => {
+    for (const source of sources) {
       console.log(`  - ${source.name} (id: ${source.id})`);
-    });
+    }
 
     return sources;
   }
